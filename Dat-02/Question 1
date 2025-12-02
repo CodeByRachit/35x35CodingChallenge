@@ -1,0 +1,35 @@
+3623. Count Number of Trapezoids I
+Solution 
+
+class Solution {
+public:
+    static const long long MOD = 1e9 + 7;
+    long long modmul(long long a, long long b) {
+        return (a % MOD) * (b % MOD) % MOD;
+    }
+    int countTrapezoids(vector<vector<int>>& points) {
+        unordered_map<long long, long long> freq;
+        for (auto &p : points) {
+            freq[p[1]]++;
+        }
+        vector<long long> seg;
+        seg.reserve(freq.size());
+        for (auto &f : freq) {
+            long long c = f.second;
+            if (c >= 2) {
+                seg.push_back((c * (c - 1) / 2) % MOD);
+            }
+        }
+        if (seg.size() < 2) return 0;
+        long long sumSeg = 0;
+        long long sumSqSeg = 0;
+        for (long long x : seg) {
+            sumSeg = (sumSeg + x) % MOD;
+            sumSqSeg = (sumSqSeg + modmul(x, x)) % MOD;
+        }
+        long long ans = (modmul(sumSeg, sumSeg) - sumSqSeg + MOD) % MOD;
+        long long inv2 = (MOD + 1) / 2;
+        ans = modmul(ans, inv2);
+        return ans % MOD;
+    }
+};
