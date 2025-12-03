@@ -1,0 +1,45 @@
+30. Substring with Concatenation of All Words
+Solution 
+
+class Solution {
+public:
+    vector<int> findSubstring(string s, vector<string>& words) {
+        int n = s.size(), m = words.size(), w = words[0].size();
+        int total = m * w;
+        if (n < total) return {};
+        unordered_map<string,int> freq;
+        for (auto &x : words) freq[x]++;
+        vector<int> ans;
+        for (int i = 0; i < w; i++) {
+            unordered_map<string,int> window;
+            int count = 0;
+            int left = i;
+            for (int right = i; right + w <= n; right += w) {
+                string word = s.substr(right, w);
+                if (freq.count(word)) {
+                    window[word]++;
+                    if (window[word] <= freq[word]) count++;
+                    while (window[word] > freq[word]) {
+                        string lw = s.substr(left, w);
+                        window[lw]--;
+                        if (window[lw] < freq[lw]) count--;
+                        left += w;
+                    }
+                    if (count == m) {
+                        ans.push_back(left);
+                        string lw = s.substr(left, w);
+                        window[lw]--;
+                        count--;
+                        left += w;
+                    }
+
+                } else {
+                    window.clear();
+                    count = 0;
+                    left = right + w;
+                }
+            }
+        }
+        return ans;
+    }
+};
