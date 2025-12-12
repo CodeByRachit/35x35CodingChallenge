@@ -1,0 +1,50 @@
+3433. Count Mentions Per User
+Solution 
+
+class Solution {
+public:
+    vector<int> countMentions(int numberOfUsers, vector<vector<string>>& events) {
+        vector<int> mentions(numberOfUsers, 0);
+        vector<int> offlineUntil(numberOfUsers, 0);
+        vector<bool> online(numberOfUsers, true);
+
+        sort(events.begin(), events.end(), [&](const vector<string>& a, const vector<string>& b){
+            int ta = stoi(a[1]), tb = stoi(b[1]);
+            if (ta != tb) return ta < tb;
+            if (a[0] == b[0]) return false;
+            if (a[0] == "OFFLINE") return true;
+            if (b[0] == "OFFLINE") return false;
+            return false;
+        });
+
+        for (auto &e : events) {
+            int t = stoi(e[1]);
+            for (int i = 0; i < numberOfUsers; ++i) {
+                if (!online[i] && offlineUntil[i] <= t) online[i] = true;
+            }
+
+            if (e[0] == "OFFLINE") {
+                int u = stoi(e[2]);
+                online[u] = false;
+                offlineUntil[u] = t + 60;
+            } else {
+                string s = e[2];
+                if (s == "ALL") {
+                    for (int i = 0; i < numberOfUsers; ++i) mentions[i]++;
+                } else if (s == "HERE") {
+                    for (int i = 0; i < numberOfUsers; ++i) if (online[i]) mentions[i]++;
+                } else {
+                    istringstream iss(s);
+                    string token;
+                    while (iss >> token) {
+                        if (token.size() >= 3 && token[0] == 'i' && token[1] == 'd') {
+                            int id = stoi(token.substr(2));
+                            if (id >= 0 && id < numberOfUsers) mentions[id]++;
+                        }
+                    }
+                }
+            }
+        }
+        return mentions;
+    }
+};
