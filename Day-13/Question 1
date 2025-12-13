@@ -1,0 +1,34 @@
+3606. Coupon Code Validator
+Solution 
+
+class Solution {
+public:
+    vector<string> validateCoupons(vector<string>& code, vector<string>& businessLine, vector<bool>& isActive) {
+        vector<string> order = {"electronics", "grocery", "pharmacy", "restaurant"};
+        unordered_map<string, int> rank;
+        for (int i = 0; i < 4; i++) rank[order[i]] = i;
+        vector<pair<int, string>> valid;
+        for (int i = 0; i < code.size(); i++) {
+            if (!isActive[i]) continue;
+            if (rank.find(businessLine[i]) == rank.end()) continue;
+            string c = code[i];
+            if (c.empty()) continue;
+            bool ok = true;
+            for (char ch : c) {
+                if (!(isalnum(ch) || ch == '_')) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (!ok) continue;
+            valid.push_back({rank[businessLine[i]], c});
+        }
+        sort(valid.begin(), valid.end(), [](auto &a, auto &b) {
+            if (a.first != b.first) return a.first < b.first;
+            return a.second < b.second;
+        });
+        vector<string> ans;
+        for (auto &p : valid) ans.push_back(p.second);
+        return ans;
+    }
+};
